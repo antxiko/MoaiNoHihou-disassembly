@@ -1,0 +1,98 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moai no Hihou - desensamblado comentado</title>
+<style>
+:root{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;--linea:#23262e;
+  --rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+@media (prefers-color-scheme:light){:root{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;
+  --panel:#f7f6f2;--linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}}
+:root[data-theme="dark"]{--tinta:#cfd0d4;--suave:#83868f;--fondo:#000;--panel:#0c0e13;
+  --linea:#23262e;--rojo:#ff897d;--cyan:#65dbef;--verde:#3eb849;--oro:#ded087}
+:root[data-theme="light"]{--tinta:#191a1e;--suave:#5a5d66;--fondo:#e9e7e1;--panel:#f7f6f2;
+  --linea:#d0cdc5;--rojo:#b23f34;--cyan:#1c6b7c;--verde:#2b7734;--oro:#8a7420}
+*{box-sizing:border-box}
+body{margin:0;background:var(--fondo);color:var(--tinta);padding:0 1.25rem 6rem;
+  font:15px/1.7 ui-monospace,"SF Mono",Menlo,Consolas,monospace}
+.w{max-width:1120px;margin:0 auto}
+.n{max-width:68ch}
+h1,h2,h3,h4{font-weight:400;text-wrap:balance}
+a{color:var(--cyan)}
+img{image-rendering:pixelated;max-width:100%;height:auto;display:block}
+header.top{display:flex;flex-direction:column;align-items:center;gap:1.5rem;
+  padding:4rem 0 2rem;text-align:center}
+header.top img{width:min(100%,642px)}
+.claim{max-width:60ch;color:var(--suave);font-size:1.05rem}
+.claim b{color:var(--tinta);font-weight:400}
+.ficha{display:flex;flex-wrap:wrap;justify-content:center;gap:0 1.5rem;width:100%;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--suave);
+  border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);padding:.85rem 0}
+.ficha b{color:var(--rojo);font-weight:400}
+nav{display:flex;flex-wrap:wrap;gap:1.25rem;justify-content:center;padding:1.25rem 0;
+  font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+nav a{color:var(--suave);text-decoration:none;border-bottom:1px solid transparent}
+nav a:hover,nav a:focus{color:var(--tinta);border-bottom-color:var(--rojo)}
+nav.docs{border-top:1px solid var(--linea);border-bottom:1px solid var(--linea);
+  margin-bottom:1rem}
+section{margin-top:4.5rem;scroll-margin-top:1rem}
+section>h2{font-size:1rem;letter-spacing:.1em;text-transform:uppercase;
+  border-left:3px solid var(--rojo);padding-left:.9rem;margin:0 0 1.5rem}
+.cifras{display:grid;gap:1px;background:var(--linea);border:1px solid var(--linea);
+  grid-template-columns:repeat(auto-fit,minmax(160px,1fr))}
+.cifra{background:var(--panel);padding:1.1rem}
+.cifra b{display:block;font-size:1.7rem;color:var(--oro);font-weight:400;
+  font-variant-numeric:tabular-nums;line-height:1.2}
+.cifra span{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--suave)}
+.hall{border-top:1px solid var(--linea);padding-top:1.75rem;margin-top:2.5rem}
+.hall:first-of-type{border-top:0;padding-top:0;margin-top:0}
+.hall h3{margin:0 0 .75rem;font-size:1.15rem;color:var(--rojo)}
+.hall h4{color:var(--oro);margin:1.5rem 0 .5rem;font-size:.95rem}
+.hall p{margin:0 0 1rem}
+pre.asm{background:var(--panel);border-left:2px solid var(--verde);margin:1.25rem 0;
+  padding:1rem 1.1rem;overflow-x:auto;font-size:13px;line-height:1.6;color:var(--tinta)}
+.par{display:grid;gap:1.25rem;grid-template-columns:1fr}
+@media(min-width:820px){.par{grid-template-columns:1fr 1fr}}
+.par figure{margin:0}
+table{border-collapse:collapse;width:100%;margin:1.25rem 0;font-size:13px;display:block;
+  overflow-x:auto}
+th,td{text-align:left;padding:.5rem .75rem;border-bottom:1px solid var(--linea)}
+th{color:var(--suave);font-weight:400;font-size:11px;letter-spacing:.07em;text-transform:uppercase}
+td.num{font-variant-numeric:tabular-nums;color:var(--oro)}
+.nivel{margin-top:2rem}
+.nivel h3{margin:0 0 .9rem;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase}
+.nivel em{color:var(--cyan);font-style:normal}
+.sep{color:var(--suave);margin:0 .6rem}
+.rejilla{display:grid;gap:.9rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
+.rejilla figure{margin:0;background:var(--panel);box-shadow:0 0 0 1px var(--linea)}
+.rejilla figcaption{display:flex;justify-content:space-between;padding:.45rem .65rem;
+  font-size:11px;color:var(--suave);border-top:1px solid var(--linea)}
+.dir{font-variant-numeric:tabular-nums;color:var(--verde)}
+footer{margin-top:5rem;padding-top:1.5rem;border-top:1px solid var(--linea);
+  color:var(--suave);font-size:12px}
+
+/* Aviso de trabajo en curso: tiene que verse antes que las cifras, porque un
+   100% mal leido hace mas dano que no ponerlo. */
+.aviso{background:#3a2a10;border-left:3px solid var(--oro);margin:1.5rem auto;
+  padding:1rem 1.2rem;max-width:900px;border-radius:4px}
+.aviso p{margin:0;color:var(--tinta);font-size:15px;line-height:1.65}
+.galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+  gap:1.5rem;margin:1.5rem 0}
+.galeria figure{margin:0}
+.galeria img{width:100%;height:auto;image-rendering:pixelated;
+  border:1px solid var(--linea);border-radius:3px}
+.galeria figcaption{color:var(--suave);font-size:13px;margin-top:.5rem}
+audio{display:block;width:100%;max-width:640px;margin:.75rem 0 1.5rem}
+</style>
+<header class="top">
+  <img src="data:image/png;base64,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" alt="Moai no Hihou">
+  <p class="claim">Treinta y dos laberintos de rocas, uno por pantalla, con la salida arriba y un minuto o m&aacute;s de reloj: el protagonista rompe a golpes los bloques, que caen con lo que tienen encima, pone los suyos para subir y esquiva a los que andan, ruedan y vuelan; cada cuarta fase es un BONUS GAME. El t&iacute;tulo sale de ejecutar la ROM, cotejado con openMSX punto a punto; la partida en GIF, jugada en openMSX; las cinco m&uacute;sicas, de su propio motor, id&eacute;nticas a openMSX cuadro a cuadro.</p>
+  <p class="ficha">Casio - <b>(c) 1986</b> - Cartucho de <b>32 KB</b> (cabecera en 0x4000) - <b>MSX</b> - Volcado <b>f924d89a...</b></p>
+</header>
+<p class="ficha" style="border:1px solid var(--oro);padding:.8em 1em;margin:1.5em 0">
+<b>Aqu&iacute; no hay capturas del juego.</b> El t&iacute;tulo sale de ejecutar la ROM (cotejado con openMSX) y los GIF son la ROM <b>funcionando en openMSX</b>: en cada cuadro se apuntan la VRAM, la RAM y los registros del VDP, y <b>c&oacute;digo nuestro los pinta</b>.</p>
+<nav><a href="LA-PARTIDA.html">La partida</a><a href="LAS-FASES.html">Las fases</a><a href="LOS-TEXTOS.html">Los textos</a><a href="LA-MUSICA.html">La m&uacute;sica</a><span style="opacity:.35">|</span><a href="CURIOSIDADES.html">Curiosidades</a><span style="opacity:.35">|</span><a href="POR-DENTRO.html">Por dentro</a><a href="../" style="margin-left:auto;color:var(--oro)">In English</a></nav>
+<section id="numbers">
+  <h2>El cartucho en cifras</h2>
+  <div class="cifras"><div class="cifra"><b>100 %</b><span>del binario explicado</span></div><div class="cifra"><b>695</b><span>rutinas y etiquetas</span></div><div class="cifra"><b>42,1 %</b><span>del listado comentado</span></div><div class="cifra"><b>11.848</b><span>bytes de código</span></div><div class="cifra"><b>20.920</b><span>bytes de datos</span></div><div class="cifra"><b>0</b><span>bytes sin identificar</span></div></div>
+</section>
+<section id="pages"><h2>Lo que hay dentro</h2><div class="hall"><h3>El juego</h3><ul><li><a href="LA-PARTIDA.html">La partida</a>: la presentaci&oacute;n de CASIO, el t&iacute;tulo, los mandos, los golpes y los bloques, el tiempo, las vidas y los puntos.</li><li><a href="LAS-FASES.html">Las fases</a>: los 32 laberintos, el BONUS GAME, lo que se coge, los enemigos y el final con tres moai.</li><li><a href="LOS-TEXTOS.html">Los textos</a>: todos los textos de la ROM, con su traducci&oacute;n.</li><li><a href="LA-MUSICA.html">La m&uacute;sica</a>: las cinco m&uacute;sicas, de su propio motor de sonido y cotejadas con openMSX.</li></ul></div><div class="hall"><h3>Curiosidades</h3><ul><li><a href="CURIOSIDADES.html">Curiosidades</a>: el selector de fase, SELECT y ESC en el t&iacute;tulo, STOP para mirar, un marcador al que le falta un texto, textos sin usar.</li></ul></div><div class="hall"><h3>Por dentro</h3><ul><li><a href="POR-DENTRO.html">Por dentro</a>: rehacer la ROM, el cartucho, la BIOS que usa, el bucle, el mapa, la RAM y las herramientas.</li></ul></div></section>
+<footer><p>Esto es trabajo de documentación y preservación: el código y los gráficos siguen siendo de sus autores y de Casio, y la imagen del cartucho no se distribuye.</p></footer>

@@ -273,19 +273,19 @@ C 0x80AE SELECT (bit 6)?
 C 0x80B2 pulsada: 0xE023 = 1
 C 0x80B7 la fila 7 otra vez
 C 0x80BC ESC (bit 2)?
-L 0xADD4 casillas_pon              Los dibujos de las casillas 0x30-0xFF (0x6180, o 0x6980 desde la escena 4; 0x680 bytes) en DE
+L 0xADD4 casillas_pon              Los dibujos de las casillas 0x30-0xFF (0x6180; con 0xE04A de 4 o mas, 0x6980: solo la pantalla del premio, que lo pone a 0xFF; 0x680 bytes) en DE
 L 0xADE1 casillas_pon_1
 L 0xADE4 casillas_pon_va
-L 0xADE9 colores_pon               Sus colores (0x7180, o 0x7980 desde la escena 4) en DE
+L 0xADE9 colores_pon               Sus colores (0x7180; con 0xE04A de 4 o mas, 0x7980) en DE
 L 0xADF6 colores_pon_1
 C 0xABB9 el boton 2
 C 0xABBC el boton 1
-C 0xADD5 la escena
+C 0xADD5 0xE04A (0xFF: el premio)
 C 0xADD8 4 o mas?
 C 0xADDC 0x6980
 C 0xADE1 0x6180
 C 0xADE4 0x680 bytes
-C 0xADEA la escena
+C 0xADEA 0xE04A
 C 0xADED 4 o mas?
 C 0xADF1 0x7980
 C 0xADF6 0x7180
@@ -356,7 +356,7 @@ C 0x805F los dibujos de los sprites
 L 0x403B prota_cara                La marca del protagonista en el marcador de la derecha (el sprite 0xE170, dibujo 0x7C): su Y, 0x68 + la vista x 3 + la Y del protagonista / 64; su X, 0xD8 + su X / 16, pero no menos que la tabla de 0x4089; el color 15, que se apaga cada 16 cuadros
 D 0x4089 0x40A9 tabla_4089         La X minima de la marca del protagonista para cada una de sus 32 Y (0x68-0x87)
 L 0x40A9 fase_dato                 Un byte de la fase (0xE00A) en la tabla de 0x40B5
-D 0x40B5 0x40D6 fase_tabla         Un byte por fase (33)
+D 0x40B5 0x40D6 fase_tabla         El premio de cada fase en miles de puntos, en BCD (de 1 a 24; 0 tras los BONUS), y un 0 mas
 L 0x40D6 fase_tiempo               Dos bytes de la fase (0xE00A x 2) de la tabla de 0x40EB, en 0xE36B y 0xE36C
 L 0x807D titulo                    El titulo: la pantalla, la presentacion de CASIO; las teclas SELECT (0xE023 = 1) y ESC (0xE039 = 2, 0xE032 = 0x50); el titulo (0xE700) con el nombre, los textos y los creditos (0x81A4) debajo; tras 0x80 cuadros, los creditos suben (0xE364, cada 16 cuadros) y despues la demostracion; con el boton, la partida
 C 0x807D a cero
@@ -508,16 +508,16 @@ C 0x8573 x 2
 C 0x8577 la tabla
 C 0x857D la cifra de abajo
 C 0x8586 la de arriba
-L 0x858C fase_tipo                 El tipo de la fase (0x85B5): con el bit 7, 0xE320; si no, 0xE31F; 0xE113 = 8
+L 0x858C fase_tiempo_pon           El tiempo de la fase (0x85B5): con el bit 7, los segundos (0xE320); si no, los minutos (0xE31F); 0xE113 = 8
 C 0x8597 la tabla de 0x85B5
-C 0x859C el bit 7?
-L 0x85AA fase_tipo_80
-D 0x85B5 0x85D5 fases_tipos        Un byte por fase (32)
+C 0x859C el bit 7: segundos?
+L 0x85AA fase_tiempo_segundos
+D 0x85B5 0x85D5 fases_tiempos      El tiempo de cada fase (32): los minutos en BCD (de 1 a 15) o, con el bit 7, los segundos (los BONUS: 20, 25, 30 y 35)
 L 0x85D5 puntos_pinta              Los puntos (0xE033) en la fila 1 y el record (0xE036) en la fila 1, columna 26
 L 0x85EA fase_salida               P= con las vidas y PUSH TR1 TO START (0x8616) en el marcador; el efecto 2; espera; las cuentas; y el bucle
 C 0x85F0 la fila 8, columna 27
 C 0x85F6 las vidas
-C 0x8600 el efecto 2
+C 0x8600 la musica 2
 D 0x8616 0x862B salida_texto       P=, 0xFF, PUSH TR1 TO START, 0xFF
 L 0x862B objeto_quieto             +0xE del objeto IY a 0
 L 0x8631 sprites_borra             0xE100-0xE180 a cero y la tabla de atributos a 0
@@ -617,9 +617,9 @@ C 0x8980 fuera de la pantalla?
 C 0x8988 colores 11 y 8
 L 0x8993 vista_fuera
 C 0x8993 sin color
-L 0x899E tocado                    Tocado (0xE183): con SELECT en el titulo, nada, salvo el 0x80; si no, el efecto 1, el record, y la caida: los dibujos de la tabla de 0x8A91 cada 8 cuadros; una vida menos y la fase otra vez; sin vidas, GAME OVER
+L 0x899E tocado                    Tocado (0xE183): con SELECT en el titulo, nada, salvo el 0x80, que nadie escribe (solo 0xFF, 1 y 0); si no, el efecto 1, el record, y la caida: los dibujos de la tabla de 0x8A91 cada 8 cuadros; una vida menos y la fase otra vez; sin vidas, GAME OVER
 C 0x899E SELECT en el titulo?
-C 0x89A4 0x80: aunque haya SELECT
+C 0x89A4 0x80: aunque haya SELECT (nadie lo escribe)
 C 0x89AB nada
 C 0x89AF al bucle
 L 0x89B2 muere
@@ -672,21 +672,21 @@ L 0x8AB8 colores_gira2             Lo mismo en las casillas 0xF0-0xF1 y 0xF4-0xF
 L 0x8AD5 colores_dos               6 + 6 bytes de color A desde HL, saltando 2
 L 0x8AD7 colores_dos_1
 L 0x8AE3 colores_dos_2
-L 0x8AEA pinchos                   ¿Hay casillas 0x30-0x37 debajo de IY? (leidas de la VRAM con RDVRM): A = 0xFF si; 0 si no
+L 0x8AEA aplastado                 ¿Hay una roca (las casillas 0x30-0x37, leidas de la VRAM con RDVRM) en la fila de arriba del sprite IY, la de su cabeza? A = 0xFF si; 0 si no: una roca que cae encima aplasta
 C 0x8AEA su sitio en la tabla de nombres
 C 0x8AED la fila de abajo
 C 0x8AF1 en una columna exacta?
 C 0x8AF9 RDVRM
 C 0x8AFC 0x30-0x37?
-L 0x8B04 pinchos_2
+L 0x8B04 aplastado_2
 C 0x8B04 la de al lado
 C 0x8B05 RDVRM
-L 0x8B10 pinchos_si
-L 0x8B13 pinchos_no
+L 0x8B10 aplastado_si
+L 0x8B13 aplastado_no
 L 0x8B15 espera_20                 Espera 0x20 cuadros
 L 0x8B19 espera_20_bucle
 D 0x8B21 0x8B2C bonus_cuenta_texto Lo que se escribe en el BONUS: el dibujo y "=" con lo cogido
-L 0x8B2C fase_acabada              Una fase acabada: en el BONUS, lo cogido (0xE30D) y sus puntos; si no, la fase siguiente, su premio en 0xE034 (la tabla de 0x40B5) y YOU GET BONUS ... PTS y GOOD LUCK TO NEXT STAGE; la musica 3 y el protagonista cruza la pantalla de izquierda a derecha; despues de la 31, el final
+L 0x8B2C fase_acabada              Una fase acabada: en el BONUS, lo cogido (0xE30D) y sus puntos; si no, la fase siguiente, su premio en 0xE034 (la tabla de 0x40B5) y YOU GET BONUS ... PTS; la musica 3 y el protagonista cruza la pantalla de izquierda a derecha; despues de la 31, el final
 C 0x8B2C la fase
 C 0x8B2F la 31: el final
 C 0x8B34 0x20 cuadros
@@ -734,7 +734,7 @@ C 0x8C49 los 0x40 bytes del protagonista a cero
 L 0x8C4F fase_cruza_borra
 C 0x8C53 la musica entera
 C 0x8C56 la fase siguiente
-L 0x8C59 final                     El final: la musica 5; el protagonista cruza la pantalla y, en las X 0x30, 0x85 y 0xCC, aparece un moai (0x412B, 8 x 14 casillas); PJM1622 (0x8D3C) en la fila 1; los colores giran con la musica 5 una y otra vez hasta el boton; y el titulo
+L 0x8C59 final                     El final: la musica 5; el protagonista cruza la pantalla y, en las X 0x30, 0x85 y 0xCC, el moai que hay en ese sitio se cambia por un monton de joyas (0x412B, 8 x 14 casillas); PJM1622 (0x8D3C) en la fila 1; los colores giran con la musica 5 una y otra vez hasta el boton; y el titulo
 C 0x8C59 la pantalla
 C 0x8C5C ENASCR
 C 0x8C5F la musica 5
@@ -742,7 +742,7 @@ C 0x8C64 el protagonista a la izquierda
 L 0x8C67 final_cuadro
 C 0x8C67 un cuadro
 C 0x8C72 un paso
-C 0x8C79 la X 0x30: el primer moai
+C 0x8C79 la X 0x30: el primer monton
 C 0x8C80 0x85: el segundo
 C 0x8C86 0xCC: el tercero
 C 0x8C8B al otro lado?
@@ -757,12 +757,12 @@ C 0x8CB1 el boton?
 C 0x8CBC la fase 0...
 C 0x8CC0 ...sin partida
 C 0x8CC6 el titulo
-L 0x8CC9 moai1                     Un moai (0x412B, 14 filas de 8) en la fila 2, columna 3...
-L 0x8CCE moai2                     ...en la fila 4, columna 13...
-L 0x8CD3 moai3                     ...o en la fila 3, columna 22
-L 0x8CD6 moai_pinta
-L 0x8CDC moai_fila
-L 0x8CDE moai_casilla
+L 0x8CC9 joyas1                    Un monton de joyas (0x412B, 14 filas de 8) en la fila 2, columna 3...
+L 0x8CCE joyas2                    ...en la fila 4, columna 13...
+L 0x8CD3 joyas3                    ...o en la fila 3, columna 22
+L 0x8CD6 joyas_pinta
+L 0x8CDC joyas_fila
+L 0x8CDE joyas_casilla
 C 0x8CDF WRTVRM
 L 0x8CF3 cruza_empieza             El protagonista en la X 8, la Y 0x98 (colores 15 y 9) y su sombra (0xE120, dibujo 0x78)
 L 0x8D18 cruza_paso                Un punto a la derecha, con la sombra 10 por encima, cambiando de color
@@ -770,7 +770,7 @@ C 0x8D18 un punto
 C 0x8D24 la sombra, 10 por encima
 C 0x8D2C su color, el siguiente
 C 0x8D35 los sprites
-D 0x8D3C 0x8D7B final_textos       PJM1622 (0x8D3C), YOU GET BONUS (0x8D44), 1000 = 000PTS (0x8D52), GOOD LUCK TO NEXT STAGE (0x8D61)
+D 0x8D3C 0x8D7B final_textos       PJM1622 (0x8D3C), YOU GET BONUS (0x8D44), 1000 = 000PTS (0x8D52) y GOOD LUCK TO NEXT STAGE (0x8D63), que ninguna llamada a texto_vram escribe (ni hay un 0x8D63 en la ROM)
 L 0x8D7B mapa_pinta                La pantalla de la fase desde su mapa (0xE319, en 0xE704 y 0xE369): 11 filas de 16 bloques de 2 x 2 casillas, desde la fila 1, columna 1; los bloques 0 se saltan
 C 0x8D7B la fila 1, columna 1
 C 0x8D7E el mapa
@@ -1230,14 +1230,14 @@ L 0x999F dibujo_anima              ...o cada 0x28: de +5 a +5 + 12 de cuatro en 
 L 0x99A1 dibujo_anima_va
 L 0x99B5 dibujo_anima_vuelta
 L 0x99BC dibujo_anima_sigue
-L 0x99CE pinchos_objeto            Si el objeto pisa las casillas 0x30-0x37 (sin estar mirando), explota (el tipo 7) y da los puntos de su tipo (0x99F3)
+L 0x99CE aplastado_objeto          Si al objeto le cae una roca encima (las casillas 0x30-0x37 en su cabeza; sin estar mirando), explota (el tipo 7) y da los puntos de su tipo (0x99F3)
 C 0x99CE mirando?
-C 0x99D3 pinchos?
+C 0x99D3 aplastado?
 C 0x99D8 sale de la rutina del tipo
 C 0x99DC la explosion
-C 0x99E7 los puntos de su tipo
+C 0x99E7 los puntos de su tipo (con el bit 7: 0x9A74 y siguientes)
 C 0x99EF a los puntos
-D 0x99F3 0x99F9 objetos_puntos     Los puntos de cada tipo al caer en los pinchos
+D 0x99F3 0x99F9 objetos_puntos     Los puntos (centenas, BCD) de los tipos 0-5 aplastados por una roca: 500, 300, 300, 100, 100 y 100; pero se leen con el tipo con el bit 7 (0x81-0x8A): salen de 0x9A74-0x9A7D, que es codigo
 L 0x99F9 toca_prota                ¿Toca al protagonista (menos de 8 en Y y en X)? Los tipos 1, 2 y 5: con 0xE30F, uno menos y el objeto fuera (a 0, se borra su dibujo del marcador); los 3 y 6: con 0xE30C, nada; los demas, el protagonista tocado (0xE183 = 0xFF)
 C 0x99F9 el protagonista
 C 0x99FD la distancia en Y
@@ -1657,7 +1657,7 @@ C 0x9DEE a cero
 C 0x9DF6 lo que hace
 C 0x9DF9 en el aire?
 C 0x9DFC el salto
-C 0x9E00 cayendo?
+C 0x9E00 golpeando?
 C 0x9E05 el boton 2?
 C 0x9E11 sin el boton
 C 0x9E1C la demostracion: su boton
@@ -1880,8 +1880,8 @@ C 0xA33E pintada
 L 0xA336 roto_pinta_salto
 L 0xA346 roto_pinta_fin
 D 0xA347 0xA34C roto_dibujos       Los dibujos de un bloque rompiendose (0xFF al final)
-L 0xA34C roto_fin                  El bloque roto: 0x20 puntos (en pantalla, 200); las formas 0xE0-0xEC pasan a la siguiente (+0x10); las demas se borran (el bloque 0x16) y caen las que tenia encima (0x8F42)
-C 0xA34C 0x20 puntos
+L 0xA34C roto_fin                  El bloque roto: 20 puntos (0x20 en BCD); las formas 0xE0-0xEC pasan a la siguiente (+0x10); las demas se borran (el bloque 0x16) y caen las que tenia encima (0x8F42)
+C 0xA34C 20 puntos
 C 0xA351 a los puntos
 C 0xA354 su forma
 L 0xA369 roto_cambia
@@ -2032,7 +2032,7 @@ C 0xA69C quieto
 C 0xA69F el paso
 C 0xA6B2 mirando a la izquierda
 C 0xA6B6 un punto
-L 0xA6BF prota_pisa                Lo que pisa (la casilla de debajo, de la VRAM): 0x80, 0xE30F + 2 (su dibujo en el marcador, 0xFC) y 250 puntos; 0x84, 0xE30C = 0xFF (0xF8) y 300; 0x88, dos bloques mas (0xF4) y 400; 0x8C, uno mas en 0xE30D y 10; 0x90, la salida (0xE03A); lo cogido se borra; y si debajo no hay nada, cae
+L 0xA6BF prota_pisa                Lo que pisa (la casilla de debajo, de la VRAM): 0x80, 0xE30F + 2 (su dibujo en el marcador, 0xFC) y 25 puntos; 0x84, 0xE30C = 0xFF (0xF8) y 30; 0x88, dos bloques mas (0xF4) y 40; 0x8C, uno mas en 0xE30D y 100; 0x90, la salida (0xE03A); lo cogido se borra; y si debajo no hay nada, cae
 C 0xA6BF en el aire?
 C 0xA6C6 su sitio
 C 0xA6C9 la de debajo
@@ -2047,18 +2047,18 @@ L 0xA6F2 pisa_salida
 C 0xA6F2 la fase acabada
 L 0xA6F8 pisa_80
 C 0xA6F8 el efecto 1
-C 0xA6FD 0x25 (250 en pantalla)
+C 0xA6FD 25 puntos
 C 0xA706 su dibujo en el marcador
 C 0xA70E dos mas
 L 0xA718 pisa_84
-C 0xA71D 0x30
+C 0xA71D 30 puntos
 C 0xA726 su dibujo en el marcador
 L 0xA735 pisa_88
-C 0xA73A 0x40
+C 0xA73A 40 puntos
 C 0xA743 su dibujo en el marcador
 C 0xA74B dos bloques mas
 L 0xA755 pisa_8c
-C 0xA75A 1
+C 0xA75A 100 puntos (las centenas)
 C 0xA764 uno mas...
 C 0xA769 ...en BCD
 L 0xA76D pisa_borra
@@ -2912,7 +2912,7 @@ C 0xB6F1 ya no suena
 C 0xB6F9 a cero
 D 0x4000 0x4010 cabecera           La cabecera del cartucho: "AB", INIT 0x4010, sin STATEMENT, DEVICE ni TEXT
 D 0x40EB 0x412B fase_vistas        Los limites de la vista al mirar con STOP: dos bytes por fase (32), en 0xE36B y 0xE36C
-D 0x412B 0x419B moai_dibujo        Un moai: 14 filas de 8 casillas (el final pinta tres)
+D 0x412B 0x419B joyas_dibujo       Un monton de joyas: 14 filas de 8 casillas (el final pinta tres, donde estaban los moai)
 D 0x419B 0x41A1 texto_casio        CASIO en las casillas del logotipo (0x8A-0x8F)
 D 0x41A1 0x41B5 texto_push         PUSH TRIG1 OR SPACE (20 letras)
 D 0x41B5 0x41B6 texto_hueco        Un 0x10 (un blanco) entre dos textos
@@ -2923,11 +2923,11 @@ D 0x4D48 0x4E1B mapa_bonus         El mapa del BONUS GAME (el de las fases 3, 7,
 D 0x4E1B 0x4E5B fase_listas        Un puntero por fase (32) a la lista de las cosas que trae su mapa
 D 0x4E5B 0x5078 cosas_listas       Las listas de cosas: el sitio en el mapa y tres bytes, hasta 0xFF; la del BONUS en 0x5073
 D 0x5078 0x5178 fases              Las 32 fases, 8 bytes cada una: el mapa, el dibujo del marcador (0xAA68 en las 32), la altura de salida, un 0, y un puntero en la RAM del mapa (0xE800-0xEEE0)
-L 0x5178 premio_pantalla           La pantalla del premio: las casillas de las escenas desde la 4, y un dibujo de 22 filas (0x51BE) desde la fila 2, con repeticiones (0xFn x: n veces x; 0xFF, la fila siguiente)
-C 0x5178 la escena 0xFF...
+L 0x5178 premio_pantalla           La pantalla del premio: sus propias casillas (0xE04A = 0xFF: las de 0x6980 y 0x7980), y un dibujo de 22 filas (0x51BE) desde la fila 2, con repeticiones (0xFn x: n veces x; 0xFF, la fila siguiente)
+C 0x5178 0xE04A = 0xFF...
 C 0x517A ...para las casillas
 C 0x517D la pantalla
-C 0x5181 la escena 0
+C 0x5181 0xE04A a 0
 C 0x5184 la fila 2
 C 0x5187 el dibujo
 C 0x518A 22 filas
@@ -2965,13 +2965,13 @@ D 0x54BD 0x5700 ceros_54bd         Ceros
 D 0x5700 0x5800 demo_mandos        La lista de mandos de la demostracion: un byte cada 16 cuadros (la palanca y los botones)
 D 0x5800 0x6000 sprites_dibujos_rom Los dibujos de los sprites (0x800 bytes a 0x3800)
 D 0x6000 0x6180 titulo_casillas    Los dibujos de las casillas 0x30-0x5F del titulo
-D 0x6180 0x6800 casillas_0         Los dibujos de las casillas 0x30-0xFF de las escenas 0-3; desde 0x6680, las letras (0x00-0x2F)
+D 0x6180 0x6800 casillas_0         Los dibujos de las casillas 0x30-0xFF de las fases; desde 0x6680, las letras (0x00-0x2F)
 D 0x6800 0x6980 titulo_casillas2   Los dibujos de las casillas 0x60-0x8F del titulo
-D 0x6980 0x7000 casillas_4         Los dibujos de las casillas 0x30-0xFF de las escenas desde la 4
+D 0x6980 0x7000 casillas_4         Los dibujos de las casillas 0x30-0xFF de la pantalla del premio y del final
 D 0x7000 0x7180 titulo_colores     Los colores de las casillas 0x30-0x5F del titulo
-D 0x7180 0x7800 colores_0          Los colores de las casillas 0x30-0xFF de las escenas 0-3
+D 0x7180 0x7800 colores_0          Los colores de las casillas 0x30-0xFF de las fases
 D 0x7800 0x7980 titulo_colores2    Los colores de las casillas 0x60-0x8F del titulo
-D 0x7980 0x8000 colores_4          Los colores de las casillas 0x30-0xFF de las escenas desde la 4
+D 0x7980 0x8000 colores_4          Los colores de las casillas 0x30-0xFF de la pantalla del premio y del final
 D 0x8000 0x8010 ceros_8000         Ceros: INIT salta a 0x8010
 D 0xB016 0xB2CA mapas_b            Los mapas de cuatro fases (24, 17, 16 y 29), al final de la ROM
 D 0xB2CA 0xB300 mapas_sobra        Una copia del final del ultimo mapa (0xB294): nadie la lee
@@ -2982,7 +2982,7 @@ L 0xB306 salto_musica              ...una musica...
 L 0xB309 salto_sonido              ...el sonido de un cuadro...
 L 0xB30C salto_mezcla              ...el registro 7...
 L 0xB30F salto_silencio            ...y todo callado
-C 0x8010 (las letras: del cartucho)
+C 0x8010 DISSCR
 C 0xA5B1 guardado
 C 0xA5B9 la pieza x 2
 C 0xA5BB D = 0
@@ -3053,14 +3053,14 @@ C 0x9674 el color 8
 C 0x9678 el dibujo 0xE0
 C 0x967C empezado
 C 0x9680 el color parpadea
-C 0x9683 en los pinchos?
+C 0x9683 aplastado?
 C 0x9686 cambia de dibujo
 C 0x978E ya empezado?
 C 0x9794 el primer dibujo 0xEC
 C 0x9798 el color 15
 C 0x979C el dibujo 0xEC
 C 0x97A0 empezado
-C 0x97A4 en los pinchos?
+C 0x97A4 aplastado?
 C 0xA636 la X...
 C 0xA639 ...dentro de los 16 puntos...
 C 0xA63B ...desde 12?

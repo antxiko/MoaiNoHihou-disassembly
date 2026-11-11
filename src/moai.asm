@@ -118,7 +118,8 @@ fase_dato:		; Un byte de la fase (0xE00A) en la tabla de 0x40B5
 	ret			;40b4
 
 ; ----------------------------------------------------------------------
-; DATOS fase_tabla: Un byte por fase (33)
+; DATOS fase_tabla: El premio de cada fase en miles de puntos, en BCD (de 1 a
+;   24; 0 tras los BONUS), y un 0 mas
 ;   0x40b5..0x40d6  (33 bytes)
 DATA_fase_tabla:
 	defb 000h,001h,002h,003h,000h,004h,005h,006h,000h,007h,008h,009h,000h,010h,011h,012h	; 40b5  ................
@@ -155,9 +156,10 @@ DATA_fase_vistas:
 	defb 00fh,016h,012h,016h,012h,016h,001h,015h,010h,016h,00bh,012h,002h,009h,001h,015h	; 411b  ................
 
 ; ----------------------------------------------------------------------
-; DATOS moai_dibujo: Un moai: 14 filas de 8 casillas (el final pinta tres)
+; DATOS joyas_dibujo: Un monton de joyas: 14 filas de 8 casillas (el final
+;   pinta tres, donde estaban los moai)
 ;   0x412b..0x419b  (112 bytes)
-DATA_moai_dibujo:
+DATA_joyas_dibujo:
 	defb 010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h	; 412b  ................
 	defb 010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h	; 413b  ................
 	defb 010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h,010h	; 414b  ................
@@ -485,12 +487,12 @@ DATA_fases:
 ; ======================================================================
 
 
-premio_pantalla:		; La pantalla del premio: las casillas de las escenas desde la 4, y un dibujo de 22 filas (0x51BE) desde la fila 2, con repeticiones (0xFn x: n veces x; 0xFF, la fila siguiente)
-	ld a,0ffh		;5178   ; la escena 0xFF...
+premio_pantalla:		; La pantalla del premio: sus propias casillas (0xE04A = 0xFF: las de 0x6980 y 0x7980), y un dibujo de 22 filas (0x51BE) desde la fila 2, con repeticiones (0xFn x: n veces x; 0xFF, la fila siguiente)
+	ld a,0ffh		;5178   ; 0xE04A = 0xFF...
 	ld (0e04ah),a		;517a   ; ...para las casillas
 	call pantalla_prepara		;517d   ; la pantalla
 	xor a			;5180
-	ld (0e04ah),a		;5181   ; la escena 0
+	ld (0e04ah),a		;5181   ; 0xE04A a 0
 	ld hl,01840h		;5184   ; la fila 2
 	ld de,051beh		;5187   ; el dibujo
 	ld b,016h		;518a   ; 22 filas
@@ -889,8 +891,8 @@ DATA_titulo_casillas:
 	defb 007h,00fh,00bh,00fh,00fh,00bh,00bh,007h,040h,040h,040h,040h,040h,040h,040h,000h	; 6170  ........@@@@@@@.
 
 ; ----------------------------------------------------------------------
-; DATOS casillas_0: Los dibujos de las casillas 0x30-0xFF de las escenas 0-3;
-;   desde 0x6680, las letras (0x00-0x2F)
+; DATOS casillas_0: Los dibujos de las casillas 0x30-0xFF de las fases; desde
+;   0x6680, las letras (0x00-0x2F)
 ;   0x6180..0x6800  (1664 bytes)
 DATA_casillas_0:
 	defb 00fh,03fh,07fh,07fh,03fh,0ffh,0ffh,07fh,0f0h,0ech,0eeh,0f4h,0fah,0beh,0f4h,0eah	; 6180  .?..?...........
@@ -1028,8 +1030,8 @@ DATA_titulo_casillas2:
 	defb 010h,010h,010h,010h,010h,010h,010h,010h,07eh,081h,081h,081h,081h,081h,081h,07eh	; 6970  ........~......~
 
 ; ----------------------------------------------------------------------
-; DATOS casillas_4: Los dibujos de las casillas 0x30-0xFF de las escenas desde
-;   la 4
+; DATOS casillas_4: Los dibujos de las casillas 0x30-0xFF de la pantalla del
+;   premio y del final
 ;   0x6980..0x7000  (1664 bytes)
 DATA_casillas_4:
 	defb 003h,007h,07fh,0f7h,0b7h,0b7h,0b7h,080h,0ffh,0ffh,0ffh,03fh,0fdh,0ffh,0ffh,000h	; 6980  ...........?....
@@ -1167,7 +1169,7 @@ DATA_titulo_colores:
 	defb 060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,060h,0f0h	; 7170  ```````````````.
 
 ; ----------------------------------------------------------------------
-; DATOS colores_0: Los colores de las casillas 0x30-0xFF de las escenas 0-3
+; DATOS colores_0: Los colores de las casillas 0x30-0xFF de las fases
 ;   0x7180..0x7800  (1664 bytes)
 DATA_colores_0:
 	defb 060h,060h,060h,060h,060h,06fh,06fh,060h,060h,060h,060h,060h,060h,060h,060h,060h	; 7180  `````oo`````````
@@ -1305,8 +1307,8 @@ DATA_titulo_colores2:
 	defb 0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h,0f0h	; 7970  ................
 
 ; ----------------------------------------------------------------------
-; DATOS colores_4: Los colores de las casillas 0x30-0xFF de las escenas desde
-;   la 4
+; DATOS colores_4: Los colores de las casillas 0x30-0xFF de la pantalla del
+;   premio y del final
 ;   0x7980..0x8000  (1664 bytes)
 DATA_colores_4:
 	defb 050h,050h,0a0h,0a5h,0a5h,0a5h,0a5h,0a0h,04fh,04fh,0afh,0a0h,0a0h,0afh,0afh,0f0h	; 7980  PP......OO......
@@ -1426,7 +1428,7 @@ DATA_ceros_8000:
 
 
 arranque:		; El arranque: la RAM de 0xE000 a cero (0x1100 bytes), la interrupcion en H.TIMI (0xAE9A), SCREEN 2 en negro, las letras (0x6680), la pantalla y los sprites
-	call 00041h		;8010   ; (las letras: del cartucho)
+	call 00041h		;8010   ; DISSCR
 	ld hl,0e000h		;8013   ; la RAM...
 	ld de,0e001h		;8016
 	ld (hl),000h		;8019   ; ...a cero...
@@ -2062,7 +2064,7 @@ fase_numero_bonus:
 	ld hl,018bah		;855e   ; BONUS en la fila 5, columna 26
 	ld de,08517h		;8561
 	call texto_vram		;8564
-	jr fase_tipo		;8567
+	jr fase_tiempo_pon		;8567
 fase_numero_pon:
 	ld a,(0e00ah)		;8569   ; la fase
 	ld e,a			;856c
@@ -2082,7 +2084,7 @@ fase_numero_pon:
 	ld a,(hl)			;8585
 	ld hl,018bch		;8586   ; la de arriba
 	call 0004dh		;8589   ; WRTVRM
-fase_tipo:		; El tipo de la fase (0x85B5): con el bit 7, 0xE320; si no, 0xE31F; 0xE113 = 8
+fase_tiempo_pon:		; El tiempo de la fase (0x85B5): con el bit 7, los segundos (0xE320); si no, los minutos (0xE31F); 0xE113 = 8
 	ld a,008h		;858c
 	ld (0e113h),a		;858e
 	ld a,(0e00ah)		;8591   ; la fase
@@ -2091,13 +2093,13 @@ fase_tipo:		; El tipo de la fase (0x85B5): con el bit 7, 0xE320; si no, 0xE31F; 
 	ld hl,085b5h		;8597   ; la tabla de 0x85B5
 	add hl,de			;859a
 	ld a,(hl)			;859b
-	bit 7,a		;859c   ; el bit 7?
-	jr nz,fase_tipo_80		;859e
+	bit 7,a		;859c   ; el bit 7: segundos?
+	jr nz,fase_tiempo_segundos		;859e
 	ld (0e31fh),a		;85a0   ; en los minutos
 	ld a,000h		;85a3
 	ld (0e320h),a		;85a5   ; en los segundos
 	jr $+66		;85a8
-fase_tipo_80:
+fase_tiempo_segundos:
 	res 7,a		;85aa
 	ld (0e320h),a		;85ac   ; en los segundos
 	xor a			;85af
@@ -2105,9 +2107,10 @@ fase_tipo_80:
 	jr $+55		;85b3
 
 ; ----------------------------------------------------------------------
-; DATOS fases_tipos: Un byte por fase (32)
+; DATOS fases_tiempos: El tiempo de cada fase (32): los minutos en BCD (de 1 a
+;   15) o, con el bit 7, los segundos (los BONUS: 20, 25, 30 y 35)
 ;   0x85b5..0x85d5  (32 bytes)
-DATA_fases_tipos:
+DATA_fases_tiempos:
 	defb 001h,004h,005h,0a0h,006h,007h,007h,0a0h,006h,006h,008h,0a5h,008h,008h,008h,0a5h	; 85b5  ................
 	defb 010h,010h,011h,0b0h,012h,013h,015h,0b0h,015h,015h,015h,0b5h,015h,015h,015h,0b5h	; 85c5  ................
 
@@ -2133,7 +2136,7 @@ fase_salida:		; P= con las vidas y PUSH TR1 TO START (0x8616) en el marcador; el
 	inc hl			;85f9
 	call 0004dh		;85fa   ; WRTVRM
 	call tiempo_pinta		;85fd
-	ld a,002h		;8600   ; el efecto 2
+	ld a,002h		;8600   ; la musica 2
 	call pide_musica		;8602
 	call espera_musica		;8605
 	call cuentas_borra		;8608
@@ -2206,7 +2209,7 @@ fase_bucle:		; El bucle de la fase: cada cuadro, si no esta mirando (0xE326), to
 	call record_mira		;8687
 	call puntos_pinta		;868a
 	ld iy,0e100h		;868d
-	call pinchos		;8691   ; algo lo toca?
+	call aplastado		;8691   ; algo lo toca?
 	and a			;8694
 	jr z,fase_bucle_mira		;8695
 	ld (0e183h),a		;8697   ; tocado
@@ -2567,11 +2570,11 @@ vista_fuera:
 	ld (ix+013h),000h		;8997
 	pop ix		;899b
 	ret			;899d
-tocado:		; Tocado (0xE183): con SELECT en el titulo, nada, salvo el 0x80; si no, el efecto 1, el record, y la caida: los dibujos de la tabla de 0x8A91 cada 8 cuadros; una vida menos y la fase otra vez; sin vidas, GAME OVER
+tocado:		; Tocado (0xE183): con SELECT en el titulo, nada, salvo el 0x80, que nadie escribe (solo 0xFF, 1 y 0); si no, el efecto 1, el record, y la caida: los dibujos de la tabla de 0x8A91 cada 8 cuadros; una vida menos y la fase otra vez; sin vidas, GAME OVER
 	ld a,(0e023h)		;899e   ; SELECT en el titulo?
 	and a			;89a1
 	jr z,muere		;89a2
-	ld a,(0e183h)		;89a4   ; 0x80: aunque haya SELECT
+	ld a,(0e183h)		;89a4   ; 0x80: aunque haya SELECT (nadie lo escribe)
 	cp 080h		;89a7
 	jr z,muere		;89a9
 	xor a			;89ab   ; nada
@@ -2734,30 +2737,30 @@ colores_dos_2:
 	inc hl			;8ae6
 	djnz colores_dos_2		;8ae7   ; B veces
 	ret			;8ae9
-pinchos:		; ¿Hay casillas 0x30-0x37 debajo de IY? (leidas de la VRAM con RDVRM): A = 0xFF si; 0 si no
+aplastado:		; ¿Hay una roca (las casillas 0x30-0x37, leidas de la VRAM con RDVRM) en la fila de arriba del sprite IY, la de su cabeza? A = 0xFF si; 0 si no: una roca que cae encima aplasta
 	call sitio_vram		;8aea   ; su sitio en la tabla de nombres
 	ld de,00020h		;8aed   ; la fila de abajo
 	add hl,de			;8af0
 	ld a,(iy+001h)		;8af1   ; en una columna exacta?
 	and 007h		;8af4
 	and a			;8af6
-	jr nz,pinchos_2		;8af7
+	jr nz,aplastado_2		;8af7
 	call 0004ah		;8af9   ; RDVRM
 	cp 030h		;8afc   ; 0x30-0x37?
-	jr c,pinchos_2		;8afe
+	jr c,aplastado_2		;8afe
 	cp 038h		;8b00
-	jr c,pinchos_si		;8b02
-pinchos_2:
+	jr c,aplastado_si		;8b02
+aplastado_2:
 	inc hl			;8b04   ; la de al lado
 	call 0004ah		;8b05   ; RDVRM
 	cp 030h		;8b08
-	jr c,pinchos_no		;8b0a
+	jr c,aplastado_no		;8b0a
 	cp 038h		;8b0c
-	jr nc,pinchos_no		;8b0e
-pinchos_si:
+	jr nc,aplastado_no		;8b0e
+aplastado_si:
 	ld a,0ffh		;8b10
 	ret			;8b12
-pinchos_no:
+aplastado_no:
 	xor a			;8b13
 	ret			;8b14
 espera_20:		; Espera 0x20 cuadros
@@ -2781,7 +2784,7 @@ DATA_bonus_cuenta_texto:
 ; ======================================================================
 
 
-fase_acabada:		; Una fase acabada: en el BONUS, lo cogido (0xE30D) y sus puntos; si no, la fase siguiente, su premio en 0xE034 (la tabla de 0x40B5) y YOU GET BONUS ... PTS y GOOD LUCK TO NEXT STAGE; la musica 3 y el protagonista cruza la pantalla de izquierda a derecha; despues de la 31, el final
+fase_acabada:		; Una fase acabada: en el BONUS, lo cogido (0xE30D) y sus puntos; si no, la fase siguiente, su premio en 0xE034 (la tabla de 0x40B5) y YOU GET BONUS ... PTS; la musica 3 y el protagonista cruza la pantalla de izquierda a derecha; despues de la 31, el final
 	ld a,(0e00ah)		;8b2c   ; la fase
 	cp 01fh		;8b2f   ; la 31: el final
 	jp nc,final		;8b31
@@ -2918,7 +2921,7 @@ fase_cruza_borra:
 	djnz fase_cruza_borra		;8c51   ; B veces
 	call espera_musica		;8c53   ; la musica entera
 	jp fase_empieza		;8c56   ; la fase siguiente
-final:		; El final: la musica 5; el protagonista cruza la pantalla y, en las X 0x30, 0x85 y 0xCC, aparece un moai (0x412B, 8 x 14 casillas); PJM1622 (0x8D3C) en la fila 1; los colores giran con la musica 5 una y otra vez hasta el boton; y el titulo
+final:		; El final: la musica 5; el protagonista cruza la pantalla y, en las X 0x30, 0x85 y 0xCC, el moai que hay en ese sitio se cambia por un monton de joyas (0x412B, 8 x 14 casillas); PJM1622 (0x8D3C) en la fila 1; los colores giran con la musica 5 una y otra vez hasta el boton; y el titulo
 	call premio_pantalla		;8c59   ; la pantalla
 	call 00044h		;8c5c   ; ENASCR
 	ld a,005h		;8c5f   ; la musica 5
@@ -2933,15 +2936,15 @@ final_cuadro:
 	call cruza_paso		;8c72   ; un paso
 	ld a,(iy+001h)		;8c75
 	push af			;8c78
-	cp 030h		;8c79   ; la X 0x30: el primer moai
-	call z,moai1		;8c7b
+	cp 030h		;8c79   ; la X 0x30: el primer monton
+	call z,joyas1		;8c7b
 	pop af			;8c7e
 	push af			;8c7f
 	cp 085h		;8c80   ; 0x85: el segundo
-	call z,moai2		;8c82
+	call z,joyas2		;8c82
 	pop af			;8c85
 	cp 0cch		;8c86   ; 0xCC: el tercero
-	call z,moai3		;8c88
+	call z,joyas3		;8c88
 	cp 0f0h		;8c8b   ; al otro lado?
 	jr c,final_cuadro		;8c8d
 	ld hl,01822h		;8c8f   ; PJM1622 en la fila 1, columna 2
@@ -2969,34 +2972,34 @@ final_espera:
 	ld (0e000h),a		;8cc0   ; ...sin partida
 	call cuentas_borra		;8cc3
 	jp titulo		;8cc6   ; el titulo
-moai1:		; Un moai (0x412B, 14 filas de 8) en la fila 2, columna 3...
+joyas1:		; Un monton de joyas (0x412B, 14 filas de 8) en la fila 2, columna 3...
 	ld hl,01843h		;8cc9
-	jr moai_pinta		;8ccc
-moai2:		; ...en la fila 4, columna 13...
+	jr joyas_pinta		;8ccc
+joyas2:		; ...en la fila 4, columna 13...
 	ld hl,0188dh		;8cce
-	jr moai_pinta		;8cd1
-moai3:		; ...o en la fila 3, columna 22
+	jr joyas_pinta		;8cd1
+joyas3:		; ...o en la fila 3, columna 22
 	ld hl,01876h		;8cd3
-moai_pinta:
+joyas_pinta:
 	ld de,0412bh		;8cd6
 	ld b,00eh		;8cd9
 	push hl			;8cdb
-moai_fila:
+joyas_fila:
 	ld c,008h		;8cdc
-moai_casilla:
+joyas_casilla:
 	ld a,(de)			;8cde
 	call 0004dh		;8cdf   ; WRTVRM
 	inc hl			;8ce2
 	inc de			;8ce3
 	dec c			;8ce4
-	jr nz,moai_casilla		;8ce5
+	jr nz,joyas_casilla		;8ce5
 	pop hl			;8ce7
 	push de			;8ce8
 	ld de,00020h		;8ce9
 	add hl,de			;8cec
 	pop de			;8ced
 	push hl			;8cee
-	djnz moai_fila		;8cef   ; B veces
+	djnz joyas_fila		;8cef   ; B veces
 	pop hl			;8cf1
 	ret			;8cf2
 cruza_empieza:		; El protagonista en la X 8, la Y 0x98 (colores 15 y 9) y su sombra (0xE120, dibujo 0x78)
@@ -3028,7 +3031,8 @@ cruza_paso:		; Un punto a la derecha, con la sombra 10 por encima, cambiando de 
 
 ; ----------------------------------------------------------------------
 ; DATOS final_textos: PJM1622 (0x8D3C), YOU GET BONUS (0x8D44), 1000 = 000PTS
-;   (0x8D52), GOOD LUCK TO NEXT STAGE (0x8D61)
+;   (0x8D52) y GOOD LUCK TO NEXT STAGE (0x8D63), que ninguna llamada a
+;   texto_vram escribe (ni hay un 0x8D63 en la ROM)
 ;   0x8d3c..0x8d7b  (63 bytes)
 DATA_final_textos:
 	defb 020h,01ah,01dh,001h,006h,002h,002h,0ffh,029h,01fh,025h,010h,017h,015h,024h,010h	; 8d3c   .......).%...$.
@@ -3758,7 +3762,7 @@ andarin_vuelta:
 	ld (iy+00eh),a		;9481
 	jr andarin_paso		;9484
 andarin_paso:		; Cada 6 cuadros un paso: cayendo, saltando o andando
-	call pinchos_objeto		;9486   ; su dibujo
+	call aplastado_objeto		;9486   ; su dibujo
 	inc (iy+00fh)		;9489   ; la cuenta
 	ld a,(iy+00fh)		;948c   ; 6?
 	cp 006h		;948f
@@ -3851,7 +3855,7 @@ rodador_va:
 	ld a,008h		;9543   ; cae
 	ld (iy+00eh),a		;9545   ; apuntado
 rodador_paso:
-	call pinchos_objeto		;9548   ; su dibujo
+	call aplastado_objeto		;9548   ; su dibujo
 	ld (iy+00fh),000h		;954b   ; a cero
 	ld a,(iy+00eh)		;954f   ; lo que hace
 	bit 0,a		;9552   ; a la derecha?
@@ -3876,7 +3880,7 @@ volador:		; El tipo 3: dibujo 0xA8, color 15; cada 16 cuadros un paso hacia dond
 	ld (iy+002h),0a8h		;9580   ; dibujo 0xA8
 	set 7,(iy+004h)		;9584   ; en marcha
 volador_va:
-	call pinchos_objeto		;9588   ; su dibujo
+	call aplastado_objeto		;9588   ; su dibujo
 	call dibujo_anima		;958b   ; toca al protagonista?
 	inc (iy+00fh)		;958e   ; la cuenta
 	ld a,(iy+00fh)		;9591
@@ -3937,7 +3941,7 @@ andador_bichos_pon:
 andador_bichos_fin_dibujo:
 	pop af			;9611
 andador_bichos_paso:
-	call pinchos_objeto		;9612   ; su dibujo
+	call aplastado_objeto		;9612   ; su dibujo
 	ld a,(iy+001h)		;9615   ; su X
 	and 00fh		;9618   ; en una columna exacta?
 	cp 008h		;961a
@@ -3994,7 +3998,7 @@ laberinto:		; El tipo 5: dibujo 0xE0, color 8; cada 16 cuadros, en el cruce de u
 	set 7,(iy+004h)		;967c   ; empezado
 laberinto_va:
 	call color_parpadea		;9680   ; el color parpadea
-	call pinchos_objeto		;9683   ; en los pinchos?
+	call aplastado_objeto		;9683   ; aplastado?
 	call dibujo_anima		;9686   ; cambia de dibujo
 	inc (iy+00fh)		;9689
 	ld a,(iy+00fh)		;968c
@@ -4141,7 +4145,7 @@ rodante:		; El tipo 6: dibujo 0xEC, color 15; cada 12 cuadros un paso hacia dond
 	ld (iy+002h),0ech		;979c   ; el dibujo 0xEC
 	set 7,(iy+004h)		;97a0   ; empezado
 rodante_va:
-	call pinchos_objeto		;97a4   ; en los pinchos?
+	call aplastado_objeto		;97a4   ; aplastado?
 	call dibujo_anima		;97a7   ; cambia de dibujo
 	inc (iy+00fh)		;97aa
 	ld a,(iy+00fh)		;97ad
@@ -4375,11 +4379,11 @@ dibujo_anima_sigue:
 	jr z,dibujo_anima_vuelta		;99c8
 	ld (iy+002h),b		;99ca   ; el siguiente
 	ret			;99cd
-pinchos_objeto:		; Si el objeto pisa las casillas 0x30-0x37 (sin estar mirando), explota (el tipo 7) y da los puntos de su tipo (0x99F3)
+aplastado_objeto:		; Si al objeto le cae una roca encima (las casillas 0x30-0x37 en su cabeza; sin estar mirando), explota (el tipo 7) y da los puntos de su tipo (0x99F3)
 	ld a,(0e326h)		;99ce   ; mirando?
 	and a			;99d1
 	ret nz			;99d2
-	call pinchos		;99d3   ; pinchos?
+	call aplastado		;99d3   ; aplastado?
 	and a			;99d6
 	ret z			;99d7
 	pop hl			;99d8   ; sale de la rutina del tipo
@@ -4388,7 +4392,7 @@ pinchos_objeto:		; Si el objeto pisa las casillas 0x30-0x37 (sin estar mirando),
 	ld (iy+002h),0f8h		;99e0
 	ld e,a			;99e4
 	ld d,000h		;99e5
-	ld hl,099f3h		;99e7   ; los puntos de su tipo
+	ld hl,099f3h		;99e7   ; los puntos de su tipo (con el bit 7: 0x9A74 y siguientes)
 	add hl,de			;99ea
 	ld a,(hl)			;99eb
 	ld (0e322h),a		;99ec   ; en los puntos que se suman
@@ -4396,7 +4400,9 @@ pinchos_objeto:		; Si el objeto pisa las casillas 0x30-0x37 (sin estar mirando),
 	ret			;99f2
 
 ; ----------------------------------------------------------------------
-; DATOS objetos_puntos: Los puntos de cada tipo al caer en los pinchos
+; DATOS objetos_puntos: Los puntos (centenas, BCD) de los tipos 0-5 aplastados
+;   por una roca: 500, 300, 300, 100, 100 y 100; pero se leen con el tipo con
+;   el bit 7 (0x81-0x8A): salen de 0x9A74-0x9A7D, que es codigo
 ;   0x99f3..0x99f9  (6 bytes)
 DATA_objetos_puntos:
 	defb 005h,003h,003h,001h,001h,001h	; 99f3
@@ -4974,7 +4980,7 @@ prota_cuadro:
 	push af			;9dfb
 	call nz,salto		;9dfc   ; el salto
 	pop af			;9dff
-	bit 3,a		;9e00   ; cayendo?
+	bit 3,a		;9e00   ; golpeando?
 	jp nz,prota_golpe		;9e02
 	ld a,(0e02dh)		;9e05   ; el boton 2?
 	ld b,a			;9e08
@@ -5652,8 +5658,8 @@ DATA_roto_dibujos:
 ; ======================================================================
 
 
-roto_fin:		; El bloque roto: 0x20 puntos (en pantalla, 200); las formas 0xE0-0xEC pasan a la siguiente (+0x10); las demas se borran (el bloque 0x16) y caen las que tenia encima (0x8F42)
-	ld a,020h		;a34c   ; 0x20 puntos
+roto_fin:		; El bloque roto: 20 puntos (0x20 en BCD); las formas 0xE0-0xEC pasan a la siguiente (+0x10); las demas se borran (el bloque 0x16) y caen las que tenia encima (0x8F42)
+	ld a,020h		;a34c   ; 20 puntos
 	ld (0e321h),a		;a34e
 	call puntos_suma		;a351   ; a los puntos
 	ld a,(ix+006h)		;a354   ; su forma
@@ -6137,7 +6143,7 @@ prota_izq:		; A la izquierda: lo mismo (0xA7E0), mirando a la izquierda (+4 bit 
 	ld a,(iy+001h)		;a6b9
 	and 007h		;a6bc
 	ret nz			;a6be
-prota_pisa:		; Lo que pisa (la casilla de debajo, de la VRAM): 0x80, 0xE30F + 2 (su dibujo en el marcador, 0xFC) y 250 puntos; 0x84, 0xE30C = 0xFF (0xF8) y 300; 0x88, dos bloques mas (0xF4) y 400; 0x8C, uno mas en 0xE30D y 10; 0x90, la salida (0xE03A); lo cogido se borra; y si debajo no hay nada, cae
+prota_pisa:		; Lo que pisa (la casilla de debajo, de la VRAM): 0x80, 0xE30F + 2 (su dibujo en el marcador, 0xFC) y 25 puntos; 0x84, 0xE30C = 0xFF (0xF8) y 30; 0x88, dos bloques mas (0xF4) y 40; 0x8C, uno mas en 0xE30D y 100; 0x90, la salida (0xE03A); lo cogido se borra; y si debajo no hay nada, cae
 	ld a,(iy+004h)		;a6bf   ; en el aire?
 	and 004h		;a6c2
 	and a			;a6c4
@@ -6168,7 +6174,7 @@ pisa_salida:
 pisa_80:
 	ld a,001h		;a6f8   ; el efecto 1
 	call pide_efecto_a		;a6fa
-	ld a,025h		;a6fd   ; 0x25 (250 en pantalla)
+	ld a,025h		;a6fd   ; 25 puntos
 	ld (0e321h),a		;a6ff
 	call puntos_suma		;a702
 	push hl			;a705
@@ -6182,7 +6188,7 @@ pisa_80:
 pisa_84:
 	ld a,001h		;a718
 	call pide_efecto_a		;a71a
-	ld a,030h		;a71d   ; 0x30
+	ld a,030h		;a71d   ; 30 puntos
 	ld (0e321h),a		;a71f
 	call puntos_suma		;a722
 	push hl			;a725
@@ -6195,7 +6201,7 @@ pisa_84:
 pisa_88:
 	ld a,001h		;a735
 	call pide_efecto_a		;a737
-	ld a,040h		;a73a   ; 0x40
+	ld a,040h		;a73a   ; 40 puntos
 	ld (0e321h),a		;a73c
 	call puntos_suma		;a73f
 	push hl			;a742
@@ -6209,7 +6215,7 @@ pisa_88:
 pisa_8c:
 	ld a,001h		;a755
 	call pide_efecto_a		;a757
-	ld a,001h		;a75a   ; 1
+	ld a,001h		;a75a   ; 100 puntos (las centenas)
 	ld (0e322h),a		;a75c   ; en los puntos que se suman
 	call puntos_suma		;a75f
 	push hl			;a762
@@ -7084,9 +7090,9 @@ DATA_sin_uso_adcb:
 ; ======================================================================
 
 
-casillas_pon:		; Los dibujos de las casillas 0x30-0xFF (0x6180, o 0x6980 desde la escena 4; 0x680 bytes) en DE
+casillas_pon:		; Los dibujos de las casillas 0x30-0xFF (0x6180; con 0xE04A de 4 o mas, 0x6980: solo la pantalla del premio, que lo pone a 0xFF; 0x680 bytes) en DE
 	push bc			;add4
-	ld a,(0e04ah)		;add5   ; la escena
+	ld a,(0e04ah)		;add5   ; 0xE04A (0xFF: el premio)
 	cp 004h		;add8   ; 4 o mas?
 	jr c,casillas_pon_1		;adda
 	ld hl,06980h		;addc   ; 0x6980
@@ -7096,9 +7102,9 @@ casillas_pon_1:
 casillas_pon_va:
 	ld bc,00680h		;ade4   ; 0x680 bytes
 	jr $-38		;ade7
-colores_pon:		; Sus colores (0x7180, o 0x7980 desde la escena 4) en DE
+colores_pon:		; Sus colores (0x7180; con 0xE04A de 4 o mas, 0x7980) en DE
 	push bc			;ade9
-	ld a,(0e04ah)		;adea   ; la escena
+	ld a,(0e04ah)		;adea   ; 0xE04A
 	cp 004h		;aded   ; 4 o mas?
 	jr c,colores_pon_1		;adef
 	ld hl,07980h		;adf1   ; 0x7980
