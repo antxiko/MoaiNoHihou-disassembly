@@ -23,6 +23,28 @@ Los GIF de las fases son de una **grabación forzada**: el piloto de la partida 
 
 ![STAGE 19](../imagenes/fase_19.gif)
 
+## Los mapas
+
+Las 32 fases enteras, de abajo arriba como las monta el juego, a la mitad de tamaño y ocho por imagen. Están
+**pintadas ejecutando la ROM** (`tools/mapas.py`): `fase_monta` (0x849D) deja el mapa de la fase en la RAM (0xE800,
+filas de 12 bloques de 2 x 2 casillas) con lo que se coge ya puesto, y `mapa_pinta` (0x8D7B) lo pinta de 11 en 11
+filas, como hace al subir o bajar la vista. Los dibujos y colores de las casillas, que el juego carga al empezar y
+cada cuatro fases (0x864E), salen de un cuadro grabado de cada fase. Sin marcador ni sprites: los enemigos y los
+objetos que se mueven no están.
+
+Cotejo con la grabación forzada: en cada cuadro de juego, la tabla de nombres contra lo montado desde la fila que
+enseña la vista (0xE369): de 59.707 cuadros, 30.382 salen **iguales** y la mediana es 0 casillas distintas de 528.
+Los otros llevan lo que el juego cambia en la pantalla durante la partida (rocas que caen, bloques que se ponen) y
+los cuadros de los cambios de fase.
+
+![Fases 1 a 8 del juego](../imagenes/mapas_1.png)
+
+![Fases 9 a 16](../imagenes/mapas_2.png)
+
+![Fases 17 a 24](../imagenes/mapas_3.png)
+
+![Fases 25 a 32](../imagenes/mapas_4.png)
+
 ## Lo que se coge
 
 Se coge pisándolo: el juego lee la casilla que hay debajo del protagonista (`prota_pisa`, 0xA6BF).

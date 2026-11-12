@@ -24,6 +24,27 @@ The stage GIFs come from a **forced recording**: the game pilot plays each stage
 
 ![STAGE 19](imagenes/fase_19.gif)
 
+## The maps
+
+All 32 stages, whole, bottom to top as the game builds them, at half size and eight per image. They are **drawn by
+running the ROM** (`tools/mapas.py`): `fase_monta` (0x849D) leaves the stage map in RAM (0xE800, rows of 12 blocks of
+2 x 2 tiles) with the pick-ups already placed, and `mapa_pinta` (0x8D7B) draws it 11 rows at a time, as it does when
+the view goes up or down. The tile drawings and colours, which the game loads at the start and every four stages
+(0x864E), come from a recorded frame of each stage. No scoreboard or sprites: the enemies and moving objects are not
+there.
+
+Check against the forced recording: on every in-game frame, the name table against what is built from the row the
+view shows (0xE369): out of 59,707 frames, 30,382 come out **identical** and the median is 0 tiles out of 528. The
+rest carry what the game changes on screen during play (falling rocks, placed blocks) and the stage changes.
+
+![Game stages 1 to 8](imagenes/mapas_1.png)
+
+![Stages 9 to 16](imagenes/mapas_2.png)
+
+![Stages 17 to 24](imagenes/mapas_3.png)
+
+![Stages 25 to 32](imagenes/mapas_4.png)
+
 ## What can be picked up
 
 Things are picked up by stepping on them: the game reads the tile under the hero (`prota_pisa`, 0xA6BF).
