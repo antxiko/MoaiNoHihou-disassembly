@@ -89,7 +89,10 @@ PAGINAS = [
     [("CURIOSITIES.html", "CURIOSIDADES.html", "Curiosities", "Curiosidades",
       "the stage select, SELECT and ESC on the title, STOP to look around, a score that misses a text, unused texts",
       "el selector de fase, SELECT y ESC en el t&iacute;tulo, STOP para mirar, un marcador al que le falta un "
-      "texto, textos sin usar")],
+      "texto, textos sin usar"),
+     ("SECRETS-AND-BUGS.html", "SECRETOS-Y-FALLOS.html", "Secrets and bugs", "Secretos y fallos",
+      "what was searched for: the stage selector and the other keys in one table, the crushed enemies that give points read from the code (up to 16,400), a score with no cap, and the cursor keys and joystick added",
+      "lo que se ha buscado: el selector de fase y las otras teclas en una tabla, los enemigos aplastados que dan puntos le&iacute;dos del c&oacute;digo (hasta 16.400), unos puntos sin tope, y los cursores y el mando sumados")],
     [("UNDER-THE-HOOD.html", "POR-DENTRO.html", "Under the hood", "Por dentro",
       "rebuilding the ROM, the cartridge, the BIOS it uses, the main loop, the map, the RAM and the tools",
       "rehacer la ROM, el cartucho, la BIOS que usa, el bucle, el mapa, la RAM y las herramientas")],
